@@ -9,6 +9,7 @@ const handleError = require("./ErrorHandler/HandleError")
 dotenv.config()
 const cors = require("cors")
 const AdminRouter = require("./Router/AdminRouter")
+const StaffRoutes = require("./Router/StaffRoutes")
 const app = express()
 
 
@@ -31,6 +32,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(morgan("dev"))
 
 app.use("/admin", AdminRouter)
+app.use("/staff", StaffRoutes)
 
 app.get("/", (req, res) => {
     res.send("Hello Ayomide")

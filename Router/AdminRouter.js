@@ -8,6 +8,7 @@ const { AddSupplier, getSuppliers, getSingleSupplier } = require("../SupplierCon
 const isAdmin = require("../Middleware/isAdmin")
 const { postProduct, getAllProduct, updateProduct, singleProduct, deleteproduct } = require("../ProductController/Product")
 const uploadProductImage = require("../ImagesMiddleware/UploadProductImage")
+const { getTransactions } = require("../SalesController/SalesController")
 
 const AdminRouter = express.Router()
 
@@ -32,6 +33,11 @@ AdminRouter.get("/all/products", isAdminLoggedIn, isAdmin, getAllProduct)
 AdminRouter.patch("/update_product/:id", isAdminLoggedIn, isAdmin, uploadProductImage.single("productImage"), updateProduct)
 AdminRouter.delete("/delete_product/:productId", isAdminLoggedIn, isAdmin, deleteproduct)
 
+
+
+// Sales
+
+AdminRouter.get("/all/transactions",isAdminLoggedIn,isAdmin, getTransactions)
 module.exports = AdminRouter
 
                                

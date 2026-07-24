@@ -17,10 +17,10 @@ const postProduct = async (req, res, next) => {
             supplier,
             expiryDate,
             minimumStockLevel,
-        } = req.body;         
+        } = req.body;
 
         const productImg = req.file;
-                   
+
         if (!productImg) {
             return res.status(400).json({
                 Message: "Product image is required",
@@ -62,18 +62,18 @@ const postProduct = async (req, res, next) => {
             productImage: productImg.path,
             createdBy: adminId,
         });
-    
-  
-    
 
 
 
-        
 
 
-    
 
-              
+
+
+
+
+
+
         return res.status(201).json({
             Message: "Product created successfully",
             Status: "Success",
@@ -90,7 +90,7 @@ const postProduct = async (req, res, next) => {
 
 const getAllProduct = async (req, res, next) => {
     try {
-        const products = await productModel.find()
+        const products = await productModel.find().populate("createdBy", "fullName email profileImage ").populate("supplier", "supplierName companyName")
 
         if (products.length == 0 || !products) {
             return res.status(400).json({
