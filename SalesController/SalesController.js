@@ -95,13 +95,9 @@ const getTransactions = async (req, res, next) => {
     }
 }
 
-
-
-
-
-
-
-
-
-
 module.exports = { processSale, getTransactions };
+
+
+
+
+
