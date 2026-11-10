@@ -32,7 +32,13 @@ const AdminSignUp = async (req, res, next) => {
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const admin = await AdminModel.create({ ...req.body, password: hashedPassword, profileImage: adminProfileImage.path })
+        const admin = await AdminModel.create({
+            fullName,
+            email,
+            password: hashedPassword,
+            profileImage: adminProfileImage.path,
+            ...(req.body.role && ["super_admin", "supervisor", "staff"].includes(req.body.role) ? { role: req.body.role } : {})
+        })
 
         if (!admin) {
             return res.status(400).json({
@@ -54,7 +60,7 @@ const AdminSignUp = async (req, res, next) => {
         }
 
         return res.status(201).json({
-            Message: "Admin profile Created Sucessfully",
+            Message: "Admin profile Created Successfully",
             Status: "Success",
             adminInfo
         })
@@ -111,6 +117,7 @@ const AdminSignIn = async (req, res, next) => {
             Message: "Sign In Successful",
             Status: "Success",
             adminInfo,
+            accessToken: generateToken,
             accesToken: generateToken
         })
 

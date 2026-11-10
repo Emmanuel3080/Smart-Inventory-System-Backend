@@ -28,7 +28,7 @@ const handleValidateErr = (err) => {
 };
 
 const handleCastError = (err) => {
-    const errMessage = `${err.value} is invaild in my ${err.kind} Field`;
+    const errMessage = `${err.value} is invalid in my ${err.kind} Field`;
 
     return {
         errMessage,
@@ -37,7 +37,7 @@ const handleCastError = (err) => {
 };
 
 const handleJsonWebTokenError = (err) => {
-    const errMessage = `Inavaild Signature`;
+    const errMessage = `Invalid Signature`;
 
     return {
         errMessage,

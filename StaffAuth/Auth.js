@@ -6,11 +6,20 @@ const StaffModel = require("../Model/StaffModel");
 dotenv.config()
 
 
-const RegisterStaff = async (req, res) => {
+const RegisterStaff = async (req, res, next) => {
     try {
         const { firstName, lastName, email, password } = req.body;
 
-        const existingStaff = await StaffModel.findOne({ email });
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({
+                message: "All fields are required (firstName, lastName, email, password)",
+                status: "error"
+            });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const existingStaff = await StaffModel.findOne({ email: normalizedEmail });
         if (existingStaff) {
             return res.status(400).json({
                 message: "Email is already registered as a staff member."
@@ -20,11 +29,15 @@ const RegisterStaff = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Security rule: Independently registered staff remain unassigned (adminId: null).
+        // Never accept arbitrary adminId from request payload!
         const staff = await StaffModel.create({
             firstName,
             lastName,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
+            adminId: null,
+            role: "staff"
         });
 
         const staffInfo = {
@@ -32,15 +45,12 @@ const RegisterStaff = async (req, res) => {
             firstName: staff.firstName,
             lastName: staff.lastName,
             email: staff.email,
+            adminId: staff.adminId,
             role: staff.role,
             isActive: staff.isActive,
             createdAt: staff.createdAt,
             updatedAt: staff.updatedAt,
-
-
-            
-
-        }
+        };
 
         return res.status(201).json({
             message: "Staff Profile Created successfully!",
@@ -50,12 +60,11 @@ const RegisterStaff = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-
         next(error)
     }
 };
 
-const loginStaff = async (req, res) => {
+const loginStaff = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -98,11 +107,11 @@ const loginStaff = async (req, res) => {
             firstName: staff.firstName,
             lastName: staff.lastName,
             email: staff.email,
+            adminId: staff.adminId,
             role: staff.role,
             isActive: staff.isActive,
             createdAt: staff.createdAt,
             updatedAt: staff.updatedAt,
-
         }
 
 

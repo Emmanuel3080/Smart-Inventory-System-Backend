@@ -9,10 +9,16 @@ const staffSchema = new mongoose.Schema({
         type: String, required: true
     },
     email: {
-        type: String, required: true, unique: true
+        type: String, required: true, unique: true, lowercase: true, trim: true
     },
     password: {
         type: String, required: true, select: false
+    },
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+        default: null,
+        index: true
     },
     role: {
         type: String,
@@ -22,6 +28,9 @@ const staffSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
+staffSchema.index({ adminId: 1, email: 1 });
+staffSchema.index({ adminId: 1, isActive: 1 });
+staffSchema.index({ adminId: 1, createdAt: -1 });
 
 const StaffModel = mongoose.model("staff", staffSchema)
 module.exports = StaffModel

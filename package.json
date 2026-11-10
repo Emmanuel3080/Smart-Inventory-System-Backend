@@ -4,7 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node test/inventoryAccess.test.js && node test/adminStaffListing.test.js",
+    "test:ownership": "node test/inventoryAccess.test.js",
+    "test:staff-list": "node test/adminStaffListing.test.js",
+    "migrate": "node scripts/migrateInventoryOwnership.js",
     "start": "nodemon server.js"
   },
   "keywords": [],

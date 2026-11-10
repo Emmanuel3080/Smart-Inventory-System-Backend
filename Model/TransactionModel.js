@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Admin',
+        default: null,
+        index: true
+    },
     cashier: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'staff',

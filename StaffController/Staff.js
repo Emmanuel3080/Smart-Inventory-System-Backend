@@ -1,26 +1,42 @@
 const productModel = require("../Model/ProductsModel");
+const { getInventoryOwnerId } = require("../Middleware/InventoryAccess");
 
+// Helper to escape special regex characters to prevent regex injection crashes
+const escapeRegex = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
 
 const searchFilterProducts = async (req, res, next) => {
     try {
+        const ownerId = getInventoryOwnerId(req);
+        if (!ownerId) {
+            return res.status(403).json({
+                message: "Access denied. You are an unassigned staff member and cannot access inventory.",
+                status: "error"
+            });
+        }
+
         const { querys, productName, sku, category, minPrice, maxPrice, status, onlyInStock } = req.query;
-        const query = {};
+
+        // Enforce inventory ownership: search only within assigned admin's inventory
+        const query = { adminId: ownerId };
 
         if (querys) {
+            const escaped = escapeRegex(querys.trim());
             query.$or = [
-                { productName: new RegExp(querys, "i") },
-                { sku: new RegExp(querys, "i") }
+                { productName: new RegExp(escaped, "i") },
+                { sku: new RegExp(escaped, "i") }
             ];
         }
 
         if (productName) {
-            query.productName = new RegExp(productName, "i");
+            query.productName = new RegExp(escapeRegex(productName.trim()), "i");
         }
         if (sku) {
-            query.sku = new RegExp(sku, "i")
-        };
+            query.sku = new RegExp(escapeRegex(sku.trim()), "i");
+        }
         if (category) {
-            query.category = new RegExp(`^${category}$`, "i");
+            query.category = new RegExp(`^${escapeRegex(category.trim())}$`, "i");
         }
         if (status) {
             query.status = status;
@@ -40,14 +56,10 @@ const searchFilterProducts = async (req, res, next) => {
             query.quantity = { $gt: 0 };
         }
 
-        const products = await productModel.find(query).populate("createdBy", "fullName email profileImage ").populate("supplier", "supplierName companyName").sort({ createdAt: -1 });
-
-        if (products.length === 0) {
-            return res.status(404).json({
-                message: "No Products Found",
-                status: "error"
-            });
-        }
+        const products = await productModel.find(query)
+            .populate("createdBy", "fullName email profileImage")
+            .populate("supplier", "supplierName companyName")
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Products Fetched",
@@ -57,8 +69,8 @@ const searchFilterProducts = async (req, res, next) => {
         });
     } catch (error) {
         console.log(error);
-
         next(error);
     }
 };
-module.exports = searchFilterProducts
+
+module.exports = searchFilterProducts;

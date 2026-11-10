@@ -8,7 +8,6 @@ const productSchema = new mongoose.Schema(
         },
 
         sku: {
-            // [Brand]-[Category]-[Size]-[Number] : Unique code to idenity a product
             type: String,
             required: true,
             unique: true,
@@ -41,28 +40,24 @@ const productSchema = new mongoose.Schema(
         },
 
         quantity: {
-            // This represents how many units of a product are currently in stock
             type: Number,
             default: 0,
             min: 0,
         },
 
         unitPrice: {
-            // This is the cost price — how much YOU (the business) buy the product from the supplier.
             type: Number,
             required: true,
             min: 0,
         },
 
         sellingPrice: {
-            // This is the price you sell the product to customers for.
             type: Number,
             required: true,
             min: 0,
         },
 
         minimumStockLevel: {
-            // It defines the lowest allowed quantity of a product before it is considered “low stock.”
             type: Number,
             default: 5,
         },
@@ -85,16 +80,21 @@ const productSchema = new mongoose.Schema(
             ref: "Admin",
         },
 
-        // lastUpdatedBy: {
-        //   type: mongoose.Schema.Types.ObjectId,
-        //   ref: "Admin",
-        // },
+        adminId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Admin",
+            default: null,
+            index: true,
+        },
     },
     {
         timestamps: true,
     }
 );
 
+productSchema.index({ adminId: 1, sku: 1 });
+productSchema.index({ adminId: 1, category: 1 });
+productSchema.index({ adminId: 1, status: 1 });
 
 const productModel = mongoose.model("Products", productSchema)
 module.exports = productModel

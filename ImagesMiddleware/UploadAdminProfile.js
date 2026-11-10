@@ -10,7 +10,7 @@ const storage = new CloudinaryStorage({
 
     params: {
         folder: "AdminProfileImage",
-        allowedFormat: ["jpg", "png", "gif", "jpeg"],
+        allowed_formats: ["jpg", "png", "gif", "jpeg"],
         transformation: [{ width: 500, height: 500 }],
     },
 })
